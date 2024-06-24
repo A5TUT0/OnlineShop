@@ -1,3 +1,3 @@
 ### Storyboard
 
-./Storyboard/StoryboardPNG
+Storyboard/StoryboardPNG
