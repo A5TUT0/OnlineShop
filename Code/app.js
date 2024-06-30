@@ -1,212 +1,137 @@
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
+// Función para abrir un modal por su ID
+function openModal(modalId) {
+  var modal = document.getElementById(modalId);
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden"; // Evita el desplazamiento del fondo
+}
 
-const app = express();
-const port = 3000;
-const secretKey = 'your_secret_key';
+// Función para cerrar un modal por su ID
+function closeModal(modalId) {
+  var modal = document.getElementById(modalId);
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "auto"; // Permite el desplazamiento del fondo
+}
 
-app.use(bodyParser.json({ limit: '10mb' })); // Erhöhen Sie die Größenbeschränkung für das Hochladen von Bildern
-app.use(express.static('public'));
+// Event listeners para abrir los modales
+document
+  .getElementById("defaultModalButton")
+  .addEventListener("click", function () {
+    openModal("defaultModal");
+  });
 
-let db = new sqlite3.Database('./database.sqlite', (err) => {
-  if (err) {
-    console.error('Could not connect to database', err);
-  } else {
-    console.log('Connected to database');
+document
+  .getElementById("categoryModalButton")
+  .addEventListener("click", function () {
+    openModal("categoryModal");
+  });
+
+// Cerrar modal haciendo clic fuera de él
+window.onclick = function (event) {
+  if (event.target.classList.contains("modal")) {
+    event.target.classList.remove("show");
+    event.target.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
   }
-});
+};
 
-db.serialize(() => {
-  db.run("CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY, name TEXT)");
-  db.run("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, price REAL, categoryId INTEGER, image TEXT, FOREIGN KEY(categoryId) REFERENCES categories(id))");
-  db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT, role TEXT)");
-  
-  const hashedAdminPassword = bcrypt.hashSync('admin', 10);
-  db.run("INSERT INTO users (username, password, role) VALUES (?, ?, ?) ON CONFLICT(username) DO NOTHING", ['admin', hashedAdminPassword, 'admin']);
-});
+// Enviar datos del formulario de productos
+document
+  .getElementById("createProductForm")
+  .addEventListener("submit", function (e) {
+    e.preventDefault();
 
-// Middleware zur Authentifizierung
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
+    const formData = new FormData(e.target);
+    const data = {
+      name: formData.get("name"),
+      price: parseFloat(formData.get("price")),
+      categoryId: parseInt(formData.get("category")),
+    };
 
-  jwt.verify(token, secretKey, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
+    fetch("http://localhost:3000/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE5NjkxMzU5fQ.6GKGMSpcI-q2XVvFA-lAnry0XsAzija7TScblDDw4Ss", // Replace with your actual authorization token
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error al crear el producto");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("Producto creado:", result);
+        alert("Producto creado exitosamente");
+        closeModal("defaultModal");
+        // Optionally update the product table here
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Error al conectar con la API: " + error.message);
+      });
   });
-}
 
-// Middleware zur Autorisierung
-function authorizeAdmin(req, res, next) {
-  if (req.user.role !== 'admin') return res.sendStatus(403);
-  next();
-}
+// Cargar opciones de categorías al cargar la página
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("http://localhost:3000/categories")
+    .then((response) => response.json())
+    .then((data) => {
+      const categorySelect = document.getElementById("category");
 
-// Route zur Registrierung
-app.post('/register', (req, res) => {
-  const { username, password, role = 'user' } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  db.run("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [username, hashedPassword, role], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID, username, role });
+      data.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+      });
+    })
+    .catch((error) => console.error("Error fetching categories:", error));
+});
+
+// Event listener para crear una nueva categoría
+document
+  .getElementById("createCategoryForm")
+  .addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = {
+      name: formData.get("categoryName"),
+    };
+
+    fetch("http://localhost:3000/categories", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE5NjkxMzU5fQ.6GKGMSpcI-q2XVvFA-lAnry0XsAzija7TScblDDw4Ss", // Replace with your actual authorization token
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error al crear la categoría");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log("Categoría creada:", result);
+        alert("Categoría creada exitosamente");
+        closeModal("categoryModal");
+        // Add new category to the select element
+        const categorySelect = document.getElementById("category");
+        const option = document.createElement("option");
+        option.value = result.id;
+        option.textContent = result.name;
+        categorySelect.appendChild(option);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Error al conectar con la API: " + error.message);
+      });
   });
-});
-
-// Route zur Anmeldung
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    if (!user || !bcrypt.compareSync(password, user.password)) {
-      res.status(401).json({ error: 'Invalid credentials' });
-      return;
-    }
-    const token = jwt.sign({ username: user.username, role: user.role }, secretKey);
-    res.json({ token });
-  });
-});
-
-// Route zum Zurücksetzen des Passworts
-app.post('/reset-password', authenticateToken, (req, res) => {
-  const { username, newPassword } = req.body;
-  const hashedPassword = bcrypt.hashSync(newPassword, 10);
-  db.run("UPDATE users SET password = ? WHERE username = ?", [hashedPassword, username], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ message: 'Password reset successfully' });
-  });
-});
-
-// Swagger setup
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// Routes for categories (public)
-app.get('/categories', (req, res) => {
-  db.all("SELECT * FROM categories", (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-app.post('/categories', authenticateToken, authorizeAdmin, (req, res) => {
-  const { name } = req.body;
-  db.run("INSERT INTO categories (name) VALUES (?)", [name], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID, name });
-  });
-});
-
-app.get('/categories/:id', (req, res) => {
-  const { id } = req.params;
-  db.get("SELECT * FROM categories WHERE id = ?", [id], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(row || { message: 'Category not found' });
-  });
-});
-
-app.put('/categories/:id', authenticateToken, authorizeAdmin, (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  db.run("UPDATE categories SET name = ? WHERE id = ?", [name, id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ id, name });
-  });
-});
-
-app.delete('/categories/:id', authenticateToken, authorizeAdmin, (req, res) => {
-  const { id } = req.params;
-  db.run("DELETE FROM categories WHERE id = ?", [id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ message: 'Category deleted' });
-  });
-});
-
-// Routes for products (public)
-app.get('/products', (req, res) => {
-  db.all("SELECT * FROM products", (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-app.post('/products', authenticateToken, authorizeAdmin, (req, res) => {
-  const { name, price, categoryId, image } = req.body;
-  db.run("INSERT INTO products (name, price, categoryId, image) VALUES (?, ?, ?, ?)", [name, price, categoryId, image], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID, name, price, categoryId, image });
-  });
-});
-
-app.get('/products/:id', (req, res) => {
-  const { id } = req.params;
-  db.get("SELECT * FROM products WHERE id = ?", [id], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(row || { message: 'Product not found' });
-  });
-});
-
-app.put('/products/:id', authenticateToken, authorizeAdmin, (req, res) => {
-  const { id } = req.params;
-  const { name, price, categoryId, image } = req.body;
-  db.run("UPDATE products SET name = ?, price = ?, categoryId = ?, image = ? WHERE id = ?", [name, price, categoryId, image, id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ id, name, price, categoryId, image });
-  });
-});
-
-app.delete('/products/:id', authenticateToken, authorizeAdmin, (req, res) => {
-  const { id } = req.params;
-  db.run("DELETE FROM products WHERE id = ?", [id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ message: 'Product deleted' });
-  });
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
