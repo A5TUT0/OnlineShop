@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kategorien</title>
+    <!-- Agrega tus archivos CSS -->
+    <link rel="stylesheet" href="./input.css" />
+    <link href="./output.css" rel="stylesheet" />
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 10px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .show {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Encabezado -->
+    <header class="bg-gray-800 text-white py-4">
+      <div class="container mx-auto flex justify-between items-center px-4">
+        <div>
+          <h1 class="text-xl font-semibold">Dashboard</h1>
+        </div>
+        <nav>
+          <ul class="flex space-x-6">
+            <li>
+              <a href="./Products.html" class="hover:text-gray-300">Produkte</a>
+            </li>
+            <li>
+              <a href="./Category.html" class="hover:text-gray-300"
+                >Kategorien</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Botón para abrir el modal de creación de categorías -->
+    <button
+      id="categoryModalButton"
+      class="block text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+      type="button"
+      style="
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        margin-top: 1rem;
+      "
+    >
+      Kategorie erstellen
+    </button>
+
+    <!-- Modal de creación de categorías -->
+    <div
+      id="categoryModal"
+      tabindex="-1"
+      aria-hidden="true"
+      class="modal"
+      style="display: none"
+    >
+      <div class="relative p-4 w-full max-w-2xl h-full md:h-auto">
+        <!-- Contenido del modal -->
+        <div
+          class="modal-content relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5"
+        >
+          <!-- Encabezado del modal -->
+          <div
+            class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600"
+          >
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Kategorie hinzufügen
+            </h3>
+            <button
+              type="button"
+              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              onclick="closeModal('categoryModal')"
+            >
+              <svg
+                aria-hidden="true"
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              <span class="sr-only">Modal schließen</span>
+            </button>
+          </div>
+          <!-- Cuerpo del modal -->
+          <form id="createCategoryForm" action="#">
+            <div class="grid gap-4 mb-4">
+              <div>
+                <label
+                  for="categoryName"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Kategoriename
+                </label>
+                <input
+                  type="text"
+                  name="categoryName"
+                  id="categoryName"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Geben Sie den Kategorienamen ein"
+                  required
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="text-white inline-flex items-center bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              style="background-color: #155e75"
+            >
+              <svg
+                class="mr-1 -ml-1 w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Neue Kategorie hinzufügen
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de categorías -->
+    <div class="container mx-auto mt-8">
+      <h2 class="text-2xl font-semibold mb-4">Kategorien Liste</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+          <thead
+            class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"
+          >
+            <tr>
+              <th class="py-3 px-6 text-left">Name</th>
+              <th class="py-3 px-6 text-left">Aktionen</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-600 text-sm font-light">
+            <!-- Aquí se cargarán dinámicamente las categorías -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JavaScript para manejar el modal y enviar el formulario -->
+    <script>
+      // Event listener para abrir el modal de creación de categorías
+      document
+        .getElementById("categoryModalButton")
+        .addEventListener("click", function () {
+          openModal("categoryModal");
+        });
+
+      // Función para abrir el modal por su ID
+      function openModal(modalId) {
+        var modal = document.getElementById(modalId);
+        modal.style.display = "block";
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden"; // Evitar desplazamiento del fondo
+      }
+
+      // Función para cerrar el modal por su ID y limpiar el formulario correspondiente
+      function closeModal(modalId) {
+        var modal = document.getElementById(modalId);
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
+
+        // Limpiar el formulario de categorías si se cierra el modal de categorías
+        if (modalId === "categoryModal") {
+          document.getElementById("createCategoryForm").reset();
+        }
+      }
+
+      // Listener para cerrar el modal haciendo clic fuera de él
+      window.onclick = function (event) {
+        if (event.target.classList.contains("modal")) {
+          event.target.classList.remove("show");
+          event.target.setAttribute("aria-hidden", "true");
+          document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
+        }
+      };
+
+      // Función para cargar las categorías desde la API y actualizar la lista
+      function loadCategories() {
+        fetch("http://localhost:3000/categories")
+          .then((response) => response.json())
+          .then((categories) => {
+            const categoriesList = document.querySelector("tbody");
+            categoriesList.innerHTML = "";
+
+            categories.forEach((category) => {
+              const row = `
+              <tr>
+                <td class="py-3 px-6 text-left">${category.name}</td>
+                <td class="py-3 px-6 text-left">
+                  <button
+                    class="text-indigo-600 hover:text-indigo-900"
+                    onclick="editCategory('${category.id}')"
+                  >
+                    Bearbeiten
+                  </button>
+                  <button
+                    class="text-red-600 hover:text-red-900 ml-2"
+                    onclick="confirmDelete('${category.id}')"
+                  >
+                    Löschen
+                  </button>
+                </td>
+              </tr>
+            `;
+              categoriesList.innerHTML += row;
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching categories:", error);
+          });
+      }
+
+      // Listener para el formulario de creación de categorías
+      document.addEventListener("DOMContentLoaded", function () {
+        const createCategoryForm =
+          document.getElementById("createCategoryForm");
+
+        if (!createCategoryForm) {
+          console.error(
+            "No se encontró el formulario createCategoryForm en el DOM."
+          );
+          return;
+        }
+
+        // Escuchar el evento submit del formulario
+        createCategoryForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Obtener los datos del formulario
+          const formData = new FormData(e.target);
+          const data = {
+            name: formData.get("categoryName"),
+          };
+
+          // Enviar la solicitud POST para crear la categoría
+          fetch("http://localhost:3000/categories", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // Authorization: "Bearer <tu-token-de-autorizacion>",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Error al crear la categoría");
+              }
+              return response.json();
+            })
+            .then((result) => {
+              console.log("Categoría creada:", result);
+              alert("Kategorie erfolgreich erstellt");
+              closeModal("categoryModal"); // Cerrar el modal después de crear la categoría
+              loadCategories(); // Actualizar la lista de categorías
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Fehler beim Verbinden mit der API: " + error.message);
+            });
+        });
+
+        // Cargar las categorías al cargar la página
+        loadCategories();
+      });
+
+      // Función para confirmar y eliminar una categoría
+      function confirmDelete(categoryId) {
+        if (
+          confirm("Bist du sicher, dass du diese Kategorie löschen möchtest?")
+        ) {
+          fetch(`http://localhost:3000/categories/${categoryId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              // Authorization: "Bearer <tu-token-de-autorizacion>",
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Error al eliminar la categoría");
+              }
+              return response.json();
+            })
+            .then((result) => {
+              console.log("Categoría eliminada:", result);
+              alert("Kategorie erfolgreich gelöscht");
+              loadCategories(); // Actualizar la lista de categorías
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Fehler beim Verbinden mit der API: " + error.message);
+            });
+        }
+      }
+    </script>
+  </body>
+</html>
