@@ -89,13 +89,7 @@
     </button>
 
     <!-- Modal de creación de categorías -->
-    <div
-      id="categoryModal"
-      tabindex="-1"
-      aria-hidden="true"
-      class="modal"
-      style="display: none"
-    >
+    <div id="categoryModal" tabindex="-1" aria-hidden="true" class="modal">
       <div class="relative p-4 w-full max-w-2xl h-full md:h-auto">
         <!-- Contenido del modal -->
         <div
@@ -131,6 +125,7 @@
           </div>
           <!-- Cuerpo del modal -->
           <form id="createCategoryForm" action="#">
+            <input type="hidden" id="categoryId" name="categoryId" />
             <div class="grid gap-4 mb-4">
               <div>
                 <label
@@ -166,7 +161,7 @@
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              Neue Kategorie hinzufügen
+              <span id="modalAction">Neue Kategorie hinzufügen</span>
             </button>
           </form>
         </div>
@@ -193,56 +188,62 @@
       </div>
     </div>
 
-    <!-- JavaScript para manejar el modal y enviar el formulario -->
     <script>
-      // Event listener para abrir el modal de creación de categorías
-      document
-        .getElementById("categoryModalButton")
-        .addEventListener("click", function () {
-          openModal("categoryModal");
-        });
+      const token = localStorage.getItem("token");
+      let isEditMode = false;
 
-      // Función para abrir el modal por su ID
-      function openModal(modalId) {
-        var modal = document.getElementById(modalId);
-        modal.style.display = "block";
-        modal.classList.add("show");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden"; // Evitar desplazamiento del fondo
-      }
+      document.addEventListener("DOMContentLoaded", function () {
+        // Event listener para abrir el modal de creación de categorías
+        document
+          .getElementById("categoryModalButton")
+          .addEventListener("click", function () {
+            openModal("categoryModal");
+          });
 
-      // Función para cerrar el modal por su ID y limpiar el formulario correspondiente
-      function closeModal(modalId) {
-        var modal = document.getElementById(modalId);
-        modal.classList.remove("show");
-        modal.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
-
-        // Limpiar el formulario de categorías si se cierra el modal de categorías
-        if (modalId === "categoryModal") {
-          document.getElementById("createCategoryForm").reset();
+        // Función para abrir el modal por su ID
+        function openModal(modalId) {
+          var modal = document.getElementById(modalId);
+          modal.style.display = "block";
+          modal.classList.add("show");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden"; // Evitar desplazamiento del fondo
         }
-      }
 
-      // Listener para cerrar el modal haciendo clic fuera de él
-      window.onclick = function (event) {
-        if (event.target.classList.contains("modal")) {
-          event.target.classList.remove("show");
-          event.target.setAttribute("aria-hidden", "true");
+        // Función para cerrar el modal por su ID y limpiar el formulario correspondiente
+        function closeModal(modalId) {
+          var modal = document.getElementById(modalId);
+          modal.classList.remove("show");
+          modal.setAttribute("aria-hidden", "true");
           document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
+
+          // Limpiar el formulario de categorías si se cierra el modal de categorías
+          if (modalId === "categoryModal") {
+            document.getElementById("createCategoryForm").reset();
+            document.getElementById("modalAction").textContent =
+              "Neue Kategorie hinzufügen";
+            isEditMode = false;
+          }
         }
-      };
 
-      // Función para cargar las categorías desde la API y actualizar la lista
-      function loadCategories() {
-        fetch("http://localhost:3000/categories")
-          .then((response) => response.json())
-          .then((categories) => {
-            const categoriesList = document.querySelector("tbody");
-            categoriesList.innerHTML = "";
+        // Listener para cerrar el modal haciendo clic fuera de él
+        window.onclick = function (event) {
+          if (event.target.classList.contains("modal")) {
+            event.target.classList.remove("show");
+            event.target.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
+          }
+        };
 
-            categories.forEach((category) => {
-              const row = `
+        // Función para cargar las categorías desde la API y actualizar la lista
+        function loadCategories() {
+          fetch("http://localhost:3000/categories")
+            .then((response) => response.json())
+            .then((categories) => {
+              const categoriesList = document.querySelector("tbody");
+              categoriesList.innerHTML = "";
+
+              categories.forEach((category) => {
+                const row = `
               <tr>
                 <td class="py-3 px-6 text-left">${category.name}</td>
                 <td class="py-3 px-6 text-left">
@@ -261,16 +262,15 @@
                 </td>
               </tr>
             `;
-              categoriesList.innerHTML += row;
+                categoriesList.innerHTML += row;
+              });
+            })
+            .catch((error) => {
+              console.error("Error fetching categories:", error);
             });
-          })
-          .catch((error) => {
-            console.error("Error fetching categories:", error);
-          });
-      }
+        }
 
-      // Listener para el formulario de creación de categorías
-      document.addEventListener("DOMContentLoaded", function () {
+        // Listener para el formulario de creación de categorías
         const createCategoryForm =
           document.getElementById("createCategoryForm");
 
@@ -281,76 +281,116 @@
           return;
         }
 
-        // Escuchar el evento submit del formulario
         createCategoryForm.addEventListener("submit", function (e) {
           e.preventDefault();
 
-          // Obtener los datos del formulario
           const formData = new FormData(e.target);
           const data = {
             name: formData.get("categoryName"),
           };
 
-          // Enviar la solicitud POST para crear la categoría
-          fetch("http://localhost:3000/categories", {
-            method: "POST",
+          let url = "http://localhost:3000/categories";
+          let method = "POST";
+          if (isEditMode) {
+            const categoryId = document.getElementById("categoryId").value;
+            url = `http://localhost:3000/categories/${categoryId}`;
+            method = "PUT";
+          }
+
+          fetch(url, {
+            method: method,
             headers: {
               "Content-Type": "application/json",
-              // Authorization: "Bearer <tu-token-de-autorizacion>",
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(data),
           })
             .then((response) => {
               if (!response.ok) {
-                throw new Error("Error al crear la categoría");
+                throw new Error(
+                  isEditMode
+                    ? "Error al actualizar la categoría"
+                    : "Error al crear la categoría"
+                );
               }
               return response.json();
             })
             .then((result) => {
-              console.log("Categoría creada:", result);
-              alert("Kategorie erfolgreich erstellt");
-              closeModal("categoryModal"); // Cerrar el modal después de crear la categoría
-              loadCategories(); // Actualizar la lista de categorías
+              console.log(
+                isEditMode ? "Categoría actualizada:" : "Categoría creada:",
+                result
+              );
+              alert(
+                isEditMode
+                  ? "Kategorie erfolgreich aktualisiert"
+                  : "Kategorie erfolgreich erstellt"
+              );
+              closeModal("categoryModal");
+              loadCategories();
             })
             .catch((error) => {
               console.error("Error:", error);
-              alert("Fehler beim Verbinden mit der API: " + error.message);
+              alert(
+                isEditMode
+                  ? "Error al actualizar la categoría: " + error.message
+                  : "Fehler beim Verbinden mit der API: " + error.message
+              );
             });
         });
 
         // Cargar las categorías al cargar la página
         loadCategories();
-      });
 
-      // Función para confirmar y eliminar una categoría
-      function confirmDelete(categoryId) {
-        if (
-          confirm("Bist du sicher, dass du diese Kategorie löschen möchtest?")
-        ) {
-          fetch(`http://localhost:3000/categories/${categoryId}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              // Authorization: "Bearer <tu-token-de-autorizacion>",
-            },
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Error al eliminar la categoría");
-              }
-              return response.json();
-            })
-            .then((result) => {
-              console.log("Categoría eliminada:", result);
-              alert("Kategorie erfolgreich gelöscht");
-              loadCategories(); // Actualizar la lista de categorías
+        // Función para obtener datos de categoría y abrir el modal en modo de edición
+        window.editCategory = function (categoryId) {
+          fetch(`http://localhost:3000/categories/${categoryId}`)
+            .then((response) => response.json())
+            .then((category) => {
+              document.getElementById("categoryId").value = category.id;
+              document.getElementById("categoryName").value = category.name;
+              document.getElementById("modalAction").textContent =
+                "Kategorie aktualisieren";
+              isEditMode = true;
+              openModal("categoryModal");
             })
             .catch((error) => {
-              console.error("Error:", error);
-              alert("Fehler beim Verbinden mit der API: " + error.message);
+              console.error("Error fetching category:", error);
+              alert(
+                "Error al obtener los datos de la categoría: " + error.message
+              );
             });
-        }
-      }
+        };
+
+        // Función para confirmar y eliminar una categoría
+        window.confirmDelete = function (categoryId) {
+          if (
+            confirm("Bist du sicher, dass du diese Kategorie löschen möchtest?")
+          ) {
+            fetch(`http://localhost:3000/categories/${categoryId}`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Error al eliminar la categoría");
+                }
+                return response.json();
+              })
+              .then((result) => {
+                console.log("Categoría eliminada:", result);
+                alert("Kategorie erfolgreich gelöscht");
+                loadCategories(); // Actualizar la lista de categorías
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                alert("Fehler beim Verbinden mit der API: " + error.message);
+              });
+          }
+        };
+      });
     </script>
   </body>
 </html>

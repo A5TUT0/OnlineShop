@@ -6,14 +6,13 @@ const bcrypt = require("bcrypt");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 const cors = require("cors");
-
-const app = express(); // Mueve la creación de 'app' aquí
+const app = express();
 const port = 3000;
 const secretKey = "your_secret_key";
 
-app.use(cors());
-app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.json({ limit: "10mb" })); // Erhöhen Sie die Größenbeschränkung für das Hochladen von Bildern
 app.use(express.static("public"));
+app.use(cors());
 
 let db = new sqlite3.Database("./database.sqlite", (err) => {
   if (err) {
@@ -45,8 +44,7 @@ db.serialize(() => {
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  // Si no hay token, simplemente pasamos al siguiente middleware o ruta
-  if (!token) return next();
+  if (!token) return res.sendStatus(401);
 
   jwt.verify(token, secretKey, (err, user) => {
     if (err) return res.sendStatus(403);
@@ -57,6 +55,7 @@ function authenticateToken(req, res, next) {
 
 // Middleware zur Autorisierung
 function authorizeAdmin(req, res, next) {
+  if (req.user.role !== "admin") return res.sendStatus(403);
   next();
 }
 
