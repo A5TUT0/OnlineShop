@@ -12,7 +12,7 @@ const secretKey = "your_secret_key";
 const SECRET_KEY = "your_secret_key";
 
 app.use(bodyParser.json({ limit: "10mb" })); // Erhöhen Sie die Größenbeschränkung für das Hochladen von Bildern
-app.use(express.static("public"));
+app.use(express.static("src"));
 app.use(cors());
 
 let db = new sqlite3.Database("./database.sqlite", (err) => {
@@ -80,18 +80,21 @@ app.post("/register", (req, res) => {
 // Route zur Anmeldung
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-
-  const user = users.find(
-    (u) => u.username === username && u.password === password
-  );
-  if (user) {
-    const token = jwt.sign({ userId: user.id }, SECRET_KEY, {
-      expiresIn: "1h",
-    });
+  db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      res.status(401).json({ error: "Invalid credentials" });
+      return;
+    }
+    const token = jwt.sign(
+      { username: user.username, role: user.role },
+      secretKey
+    );
     res.json({ token });
-  } else {
-    res.status(401).json({ message: "Invalid credentials" });
-  }
+  });
 });
 
 // Route zum Zurücksetzen des Passworts
