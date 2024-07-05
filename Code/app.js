@@ -13,7 +13,7 @@ const port = 3000;
 const secretKey = "your_secret_key";
 const SECRET_KEY = "your_secret_key";
 
-app.use(bodyParser.json({ limit: "10mb" })); // Erhöhen Sie die Größenbeschränkung für das Hochladen von Bildern
+app.use(bodyParser.json({ limit: "10mb" })); // Erhöhen Sie die Grössenbeschränkung für das Hochladen von Bildern
 app.use(express.static("src"));
 app.use(cors());
 

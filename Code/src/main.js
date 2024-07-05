@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error("Error beim Registrieren");
+            throw new Error("Fehler beim Registrieren");
           }
           return response.json();
         })
@@ -44,21 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
               { username: result.username, role: result.role },
               "your_secret_key"
             );
-            localStorage.setItem("token", token);
-            window.location.href = "./ProductsCRUD.html";
+            localStorage.setItem("token", token); // Token im localStorage speichern
+            window.location.href = "./ProductsCRUD.html"; // Weiterleitung zur Produktseite
           } else {
-            window.location.href = "./indexUSER.html";
+            window.location.href = "./indexUSER.html"; // Weiterleitung zur Benutzerseite
           }
         })
         .catch((error) => {
-          console.error("Error:", error);
+          console.error("Fehler:", error);
           alert("Fehler beim Registrieren: " + error.message);
         });
     });
   }
-
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
 
   // Funktion zur Handhabung des Logins
   function handleLogin() {
@@ -88,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => {
           if (!response.ok) {
             return response.json().then((err) => {
-              throw new Error(err.error || "Invalid credentials");
+              throw new Error(err.error || "Ungültige Anmeldeinformationen");
             });
           }
           return response.json();
@@ -102,20 +99,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // Weiterleitung basierend auf der Rolle
           if (payload.role === "admin") {
-            window.location.href = "./ProductsCRUD.html";
+            window.location.href = "./ProductsCRUD.html"; // Weiterleitung zur Admin-Seite
           } else {
-            window.location.href = "./indexUSER.html";
+            window.location.href = "./indexUSER.html"; // Weiterleitung zur Benutzerseite
           }
         })
         .catch((error) => {
-          console.error("Error:", error);
+          console.error("Fehler:", error);
           alert("Fehler beim Einloggen: " + error.message);
         });
     });
   }
-
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/atob
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
   // Funktion zur Handhabung des Passwort-Zurücksetzens
   function handleResetPassword() {
@@ -158,16 +152,14 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then((result) => {
           alert("Passwort erfolgreich zurückgesetzt");
-          window.location.href = "./LogIn.html";
+          window.location.href = "./LogIn.html"; // Weiterleitung zur Login-Seite
         })
         .catch((error) => {
-          console.error("Error:", error);
+          console.error("Fehler:", error);
           alert("Fehler beim Zurücksetzen des Passworts: " + error.message);
         });
     });
   }
-
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
   // Funktion zum Laden der Produkte
   function loadProducts() {
@@ -233,9 +225,6 @@ document.addEventListener("DOMContentLoaded", function () {
       );
   }
 
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-
   // Funktion zum Laden der Kategorien
   function loadCategories() {
     // API-Anfrage zum Abrufen der Kategorien senden
@@ -277,8 +266,8 @@ document.addEventListener("DOMContentLoaded", function () {
   loadCategories();
 });
 
-// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
-// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
-// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch - Verwenden der Fetch API zum Abrufen von Daten
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement - Verwenden von createElement zum Erstellen neuer DOM-Elemente
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector - Verwenden von querySelector zum Auswählen von DOM-Elementen
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById - Verwenden von getElementById zum Abrufen von DOM-Elementen
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild - Verwenden von appendChild zum Hinzufügen von DOM-Elementen als Kinder eines anderen Elements
