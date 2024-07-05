@@ -4,8 +4,8 @@ Dieses Projekt ist eine Frontend-Anwendung zur Verwaltung von Produkten und Kate
 
 ## Installation
 
-Sie müssen mein Repository klonen: `https://github.com/A5TUT0/OnlineShop.git`
-Dann müssen Sie in den Ordner `Code` wechseln: `cd OnlineShop/Code`
+Sie müssen mein Repository klonen: `https://github.com/A5TUT0/OnlineShop.git`.
+Dann müssen Sie in den Ordner `Code` wechseln: `cd OnlineShop/Code`.
 Als nächstes müssen Sie im Terminal `npm install` & `node app.js` eingeben.
 
 ## Nutzung
