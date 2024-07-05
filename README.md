@@ -8,7 +8,9 @@ Sie müssen mein Repository klonen: `https://github.com/A5TUT0/OnlineShop.git`.
 
 Dann müssen Sie in den Ordner `Code` wechseln: `cd OnlineShop/Code`.
 
-Als nächstes müssen Sie im Terminal `npm install` & `node app.js` eingeben.
+Als nächstes müssen Sie im Terminal `npm install` & `npm install cors` eingeben.$
+
+Nacher dass mahcen sie `node app.js`
 
 ## Nutzung
 
