@@ -248,46 +248,35 @@
     </div>
 
     <script>
-      // Abrufen des Tokens aus dem localStorage und Initialisierung der isEditMode-Variable
-      const token = localStorage.getItem("token");
-      let isEditMode = false;
-      let deleteProductId = null; // Variable zum Speichern der Produkt-ID für die Löschung
-
       document.addEventListener("DOMContentLoaded", function () {
-        // Funktion zum Öffnen des Modals basierend auf der ID
+        const token = localStorage.getItem("token");
+        let isEditMode = false;
+        let deleteProductId = null;
+
+        // Abrir Modal
         function openModal(modalId) {
-          // Modal-Element anhand der ID abrufen
-          var modal = document.getElementById(modalId);
-          // Überprüfen, ob das Modal-Element existiert
+          const modal = document.getElementById(modalId);
           if (!modal) {
             console.error(`Kein Modal mit der ID ${modalId} gefunden.`);
             return;
           }
-          // CSS-Klasse 'show' hinzufügen, um das Modal anzuzeigen
           modal.classList.add("show");
-          // Aria-Attribut für Barrierefreiheit setzen
           modal.setAttribute("aria-hidden", "false");
-          // Verhindern, dass der Hintergrund scrollt
           document.body.style.overflow = "hidden";
         }
 
-        // Funktion zum Schließen des Modals basierend auf der ID und Bereinigen des Formulars
+        // Cerrar Modal
         function closeModal(modalId) {
-          // Modal-Element anhand der ID abrufen
-          var modal = document.getElementById(modalId);
-          // Überprüfen, ob das Modal-Element existiert
+          const modal = document.getElementById(modalId);
           if (!modal) {
             console.error(`Kein Modal mit der ID ${modalId} gefunden.`);
             return;
           }
-          // CSS-Klasse 'show' entfernen, um das Modal zu verbergen
           modal.classList.remove("show");
-          // Aria-Attribut für Barrierefreiheit setzen
           modal.setAttribute("aria-hidden", "true");
-          // Ermöglichen, dass der Hintergrund scrollt
           document.body.style.overflow = "auto";
 
-          // Formular zurücksetzen, wenn das Produkt-Modal geschlossen wird
+          // Resetear el formulario del producto si el modal es cerrado
           if (modalId === "defaultModal") {
             document.getElementById("productForm").reset();
             document.getElementById("modalAction").textContent =
@@ -296,15 +285,16 @@
           }
         }
 
-        // Event-Listener für den Button zum Öffnen des Produkt-Modals
-        var defaultModalButton = document.getElementById("defaultModalButton");
+        // Evento para abrir el modal de creación de productos
+        const defaultModalButton =
+          document.getElementById("defaultModalButton");
         if (defaultModalButton) {
           defaultModalButton.addEventListener("click", function () {
             openModal("defaultModal");
           });
         }
 
-        // Event-Listener, um das Modal zu schließen, wenn außerhalb geklickt wird
+        // Evento para cerrar el modal al hacer clic fuera del mismo
         window.onclick = function (event) {
           if (event.target.classList.contains("modal")) {
             event.target.classList.remove("show");
@@ -313,7 +303,7 @@
           }
         };
 
-        // Abrufen der Kategorien und Befüllen des Kategorie-Dropdowns
+        // Cargar categorías y llenar el dropdown
         fetch("http://localhost:3000/categories")
           .then((response) => response.json())
           .then((data) => {
@@ -330,12 +320,11 @@
             console.error("Fehler beim Abrufen der Kategorien:", error)
           );
 
-        // Event-Listener für das Produktformular
+        // Evento para el formulario de productos
         const productForm = document.getElementById("productForm");
         if (productForm) {
           productForm.addEventListener("submit", function (e) {
             e.preventDefault();
-
             const formData = new FormData(e.target);
             const fileInput = document.getElementById("file_input");
 
@@ -414,7 +403,7 @@
           });
         }
 
-        // Funktion zum Anzeigen von Alerts
+        // Mostrar alerta
         function showAlert(message, type) {
           const alertContainer = document.getElementById("alertContainer");
           const alert = document.createElement("div");
@@ -422,9 +411,7 @@
             "alert",
             type === "success" ? "success" : "error"
           );
-          alert.innerHTML = `
-            <div>${message}</div>
-          `;
+          alert.innerHTML = `<div>${message}</div>`;
           alertContainer.appendChild(alert);
           setTimeout(() => {
             alert.style.opacity = "0";
@@ -434,7 +421,7 @@
           }, 3000);
         }
 
-        // Funktion zum Laden der Produkte aus der API und Aktualisieren der Tabelle
+        // Cargar productos y actualizar la tabla
         function loadProducts() {
           fetch("http://localhost:3000/products")
             .then((response) => response.json())
@@ -448,20 +435,20 @@
                   .then((response) => response.json())
                   .then((category) => {
                     row.innerHTML = `
-                      <td class="px-6 py-4">${product.name}</td>
-                      <td class="px-6 py-4">${category.name}</td>
-                      <td class="px-6 py-4">$${product.price.toFixed(2)}</td>
-                      <td class="px-6 py-4">
-                        <button class="text-blue-600 hover:text-blue-900" onclick="editProduct(${
-                          product.id
-                        })">bearbeiten</button>
-                      </td>
-                      <td class="px-6 py-4">
-                        <button class="text-red-600 hover:text-red-900" onclick="confirmDeleteProduct(${
-                          product.id
-                        })">Löschen</button>
-                      </td>
-                    `;
+                <td class="px-6 py-4">${product.name}</td>
+                <td class="px-6 py-4">${category.name}</td>
+                <td class="px-6 py-4">$${product.price.toFixed(2)}</td>
+                <td class="px-6 py-4">
+                  <button class="text-blue-600 hover:text-blue-900" onclick="editProduct(${
+                    product.id
+                  })">bearbeiten</button>
+                </td>
+                <td class="px-6 py-4">
+                  <button class="text-red-600 hover:text-red-900" onclick="confirmDeleteProduct(${
+                    product.id
+                  })">Löschen</button>
+                </td>
+              `;
                     productTableBody.appendChild(row);
                   })
                   .catch((error) =>
@@ -474,7 +461,7 @@
             );
         }
 
-        // Funktion zum Bearbeiten eines Produkts
+        // Editar producto
         window.editProduct = function (productId) {
           fetch(`http://localhost:3000/products/${productId}`)
             .then((response) => response.json())
@@ -497,13 +484,13 @@
             });
         };
 
-        // Funktion zum Bestätigen des Löschens eines Produkts
+        // Confirmar eliminación de producto
         window.confirmDeleteProduct = function (productId) {
           deleteProductId = productId;
           openModal("deleteModal");
         };
 
-        // Funktion zum Löschen eines Produkts
+        // Eliminar producto
         window.deleteProduct = function () {
           if (!deleteProductId) return;
           fetch(`http://localhost:3000/products/${deleteProductId}`, {
@@ -534,13 +521,15 @@
             });
         };
 
-        // Event-Listener für den Bestätigungsbutton im Löschmodal
+        // Evento para el botón de confirmación de eliminación
         const confirmDeleteButton = document.getElementById(
           "confirmDeleteButton"
         );
-        confirmDeleteButton.addEventListener("click", function () {
-          deleteProduct();
-        });
+        if (confirmDeleteButton) {
+          confirmDeleteButton.addEventListener("click", function () {
+            deleteProduct();
+          });
+        }
       });
     </script>
   </body>

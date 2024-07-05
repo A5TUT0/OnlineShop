@@ -247,7 +247,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "/index.html"));
 });
 app.get("/product", (req, res) => {
-  res.sendFile(path.join(__dirname, "/src/ProductsCRUD.html"));
+  res.sendFile(path.join(__dirname, "src", "/ProductsCRUD.html"));
 });
 app.get("/categorie", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "/CategoryCRUD.html"));
@@ -259,7 +259,7 @@ app.get("/registrieren", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "/Register.html"));
 });
 app.get("/überuns", (req, res) => {
-  res.sendFile(path.join(__dirname, "src", "überuns.html"));
+  res.sendFile(path.join(__dirname, "src", "/überuns.html"));
 });
 app.use((req, res, next) => {
   res.status(404).sendFile(path.join(__dirname, "src", "error404.html"));

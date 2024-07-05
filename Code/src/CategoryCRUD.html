@@ -201,140 +201,146 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        let deleteCategoryId = null;
-        const token = localStorage.getItem("token");
+        let deleteCategoryId = null; // Speichert die ID der zu löschenden Kategorie
+        const token = localStorage.getItem("token"); // Ruft das Token aus dem localStorage ab
 
-        // Abrir modal
+        // Modal öffnen
         function openModal(modalId) {
-          const modal = document.getElementById(modalId);
+          const modal = document.getElementById(modalId); // Findet das Modal-Element nach ID
           if (modal) {
-            modal.classList.add("show");
-            document.body.style.overflow = "hidden";
+            modal.classList.add("show"); // Fügt die Klasse 'show' hinzu, um das Modal anzuzeigen
+            document.body.style.overflow = "hidden"; // Verhindert das Scrollen des Hintergrunds
           }
         }
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
 
-        // Cerrar modal
+        // Modal schließen
         function closeModal(modalId) {
-          const modal = document.getElementById(modalId);
+          const modal = document.getElementById(modalId); // Findet das Modal-Element nach ID
           if (modal) {
-            modal.classList.remove("show");
-            document.body.style.overflow = "auto";
+            modal.classList.remove("show"); // Entfernt die Klasse 'show', um das Modal zu verbergen
+            document.body.style.overflow = "auto"; // Ermöglicht das Scrollen des Hintergrunds
           }
         }
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
 
-        // Mostrar alerta
+        // Alert anzeigen
         function showAlert(message, type) {
-          const alertContainer = document.getElementById("alertContainer");
-          const alert = document.createElement("div");
+          const alertContainer = document.getElementById("alertContainer"); // Findet den Container für Alerts
+          const alert = document.createElement("div"); // Erstellt ein neues div-Element
           alert.classList.add(
             "alert",
             type === "success" ? "success" : "error"
-          );
-          alert.innerHTML = `<div>${message}</div>`;
-          alertContainer.appendChild(alert);
+          ); // Fügt Klassen für das Alert hinzu
+          alert.innerHTML = `<div>${message}</div>`; // Fügt die Nachricht in das Alert ein
+          alertContainer.appendChild(alert); // Fügt das Alert in den Container ein
           setTimeout(() => {
-            alert.style.opacity = "0";
+            alert.style.opacity = "0"; // Setzt die Transparenz des Alerts auf 0 nach 3 Sekunden
             setTimeout(() => {
-              alert.remove();
+              alert.remove(); // Entfernt das Alert aus dem DOM
             }, 300);
           }, 3000);
         }
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/setTimeout
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
 
-        // Cargar categorías
+        // Kategorien laden
         function loadCategories() {
-          fetch("http://localhost:3000/categories")
-            .then((response) => response.json())
+          fetch("http://localhost:3000/categories") // API-Aufruf zum Abrufen der Kategorien
+            .then((response) => response.json()) // Antwort in JSON umwandeln
             .then((data) => {
               const categoryTableBody =
-                document.getElementById("categoryTableBody");
-              categoryTableBody.innerHTML = "";
+                document.getElementById("categoryTableBody"); // Findet den Tabellenkörper
+              categoryTableBody.innerHTML = ""; // Löscht den aktuellen Inhalt
               data.forEach((category) => {
-                const row = document.createElement("tr");
+                const row = document.createElement("tr"); // Erstellt eine neue Zeile für jede Kategorie
                 row.innerHTML = `
-                                <td class="py-3 px-6 text-left">${category.name}</td>
-                                <td class="py-3 px-6 text-left">
-                                    <button class="text-indigo-600 hover:text-indigo-900" onclick="editCategory(${category.id})">Bearbeiten</button>
-                                    <button class="text-red-600 hover:text-red-900 ml-2" onclick="confirmDeleteCategory(${category.id})">Löschen</button>
-                                </td>
-                            `;
-                categoryTableBody.appendChild(row);
+            <td class="py-3 px-6 text-left">${category.name}</td>
+            <td class="py-3 px-6 text-left">
+              <button class="text-indigo-600 hover:text-indigo-900" onclick="editCategory(${category.id})">Bearbeiten</button>
+              <button class="text-red-600 hover:text-red-900 ml-2" onclick="confirmDeleteCategory(${category.id})">Löschen</button>
+            </td>
+          `; // Fügt die Kategorie-Daten in die Zeile ein
+                categoryTableBody.appendChild(row); // Fügt die Zeile in die Tabelle ein
               });
             })
             .catch((error) =>
               console.error("Fehler beim Abrufen der Kategorien:", error)
             );
         }
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
 
-        // Confirmar eliminación de categoría
+        // Bestätigen der Löschung einer Kategorie
         window.confirmDeleteCategory = function (categoryId) {
-          deleteCategoryId = categoryId;
-          openModal("deleteModal");
+          deleteCategoryId = categoryId; // Setzt die ID der zu löschenden Kategorie
+          openModal("deleteModal"); // Öffnet das Lösch-Bestätigungs-Modal
         };
 
-        // Eliminar categoría
+        // Kategorie löschen
         window.deleteCategory = function () {
-          if (!deleteCategoryId) return;
+          if (!deleteCategoryId) return; // Überprüft, ob eine Kategorie-ID vorhanden ist
           fetch(`http://localhost:3000/categories/${deleteCategoryId}`, {
-            method: "DELETE",
+            method: "DELETE", // HTTP-Methode DELETE
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`, // Fügt das Token in den Header ein
             },
           })
             .then((response) => {
               if (!response.ok) {
-                throw new Error("Fehler beim Löschen der Kategorie");
+                throw new Error("Fehler beim Löschen der Kategorie"); // Fehler werfen, wenn die Antwort nicht ok ist
               }
               return response.json();
             })
             .then((result) => {
-              console.log("Kategorie gelöscht:", result);
-              showAlert("Kategorie erfolgreich gelöscht", "success");
-              closeModal("deleteModal");
-              loadCategories();
+              console.log("Kategorie gelöscht:", result); // Loggt das Ergebnis
+              showAlert("Kategorie erfolgreich gelöscht", "success"); // Zeigt einen Erfolg-Alert an
+              closeModal("deleteModal"); // Schließt das Lösch-Bestätigungs-Modal
+              loadCategories(); // Lädt die Kategorien neu
             })
             .catch((error) => {
               console.error("Fehler:", error);
               showAlert(
                 "Fehler beim Löschen der Kategorie: " + error.message,
                 "error"
-              );
+              ); // Zeigt einen Fehler-Alert an
             });
         };
 
-        // Event-Listener para el botón de confirmación en el modal de eliminación
+        // Event-Listener für den Bestätigungs-Button im Lösch-Modal
         const confirmDeleteButton = document.getElementById(
           "confirmDeleteButton"
         );
         confirmDeleteButton.addEventListener("click", function () {
-          deleteCategory();
+          deleteCategory(); // Löscht die Kategorie, wenn der Button geklickt wird
         });
 
-        // Cargar categorías al cargar la página
+        // Kategorien laden, wenn die Seite geladen wird
         loadCategories();
 
-        // Event-Listener para abrir el modal de creación de categorías
+        // Event-Listener für den Button zum Öffnen des Modals zur Erstellung einer Kategorie
         document
           .getElementById("categoryModalButton")
           .addEventListener("click", function () {
-            openModal("categoryModal");
+            openModal("categoryModal"); // Öffnet das Modal zur Erstellung einer Kategorie
           });
 
-        // Event-Listener para el formulario de creación de categorías
+        // Event-Listener für das Formular zur Erstellung einer Kategorie
         document
           .getElementById("createCategoryForm")
           .addEventListener("submit", function (e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
+            e.preventDefault(); // Verhindert das Standardverhalten des Formulars
+            const formData = new FormData(e.target); // Erstellt ein FormData-Objekt aus dem Formular
             const data = {
-              name: formData.get("categoryName"),
+              name: formData.get("categoryName"), // Ruft den Kategorienamen aus dem Formular ab
             };
             let url = "http://localhost:3000/categories";
             let method = "POST";
             if (isEditMode) {
               const categoryId = document.getElementById("categoryId").value;
               url = `http://localhost:3000/categories/${categoryId}`;
-              method = "PUT";
+              method = "PUT"; // Ändert die Methode zu PUT, wenn es sich um eine Bearbeitung handelt
             }
             fetch(url, {
               method: method,
@@ -342,7 +348,7 @@
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify(data),
+              body: JSON.stringify(data), // Konvertiert die Daten in einen JSON-String
             })
               .then((response) => {
                 if (!response.ok) {
@@ -350,7 +356,7 @@
                     isEditMode
                       ? "Fehler beim Aktualisieren der Kategorie"
                       : "Fehler beim Erstellen der Kategorie"
-                  );
+                  ); // Fehler werfen, wenn die Antwort nicht ok ist
                 }
                 return response.json();
               })
@@ -360,15 +366,15 @@
                     ? "Kategorie aktualisiert:"
                     : "Kategorie erstellt:",
                   result
-                );
+                ); // Loggt das Ergebnis
                 showAlert(
                   isEditMode
                     ? "Kategorie erfolgreich aktualisiert"
                     : "Kategorie erfolgreich erstellt",
                   "success"
-                );
-                closeModal("categoryModal");
-                loadCategories();
+                ); // Zeigt einen Erfolg-Alert an
+                closeModal("categoryModal"); // Schließt das Modal
+                loadCategories(); // Lädt die Kategorien neu
               })
               .catch((error) => {
                 console.error("Fehler:", error);
@@ -378,11 +384,11 @@
                         error.message
                     : "Fehler beim Verbinden mit der API: " + error.message,
                   "error"
-                );
+                ); // Zeigt einen Fehler-Alert an
               });
           });
 
-        // Editar categoría
+        // Kategorie bearbeiten
         window.editCategory = function (categoryId) {
           fetch(`http://localhost:3000/categories/${categoryId}`)
             .then((response) => response.json())
@@ -392,17 +398,22 @@
               document.getElementById("modalAction").textContent =
                 "Kategorie aktualisieren";
               isEditMode = true;
-              openModal("categoryModal");
+              openModal("categoryModal"); // Öffnet das Modal zur Bearbeitung der Kategorie
             })
             .catch((error) => {
               console.error("Fehler beim Abrufen der Kategorie:", error);
               showAlert(
                 "Fehler beim Abrufen der Kategorie-Daten: " + error.message,
                 "error"
-              );
+              ); // Zeigt einen Fehler-Alert an
             });
         };
       });
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch - Verwenden der Fetch API zum Abrufen und Senden von Daten.
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector - Verwenden von querySelector zum Auswählen von DOM-Elementen.
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement - Verwenden von createElement zum Erstellen neuer DOM-Elemente.
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById - Verwenden von getElementById zum Auswählen von DOM-Elementen nach ID.
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild - Verwenden von appendChild zum Hinzufügen von DOM-Elementen als Kinder eines anderen Elements.
     </script>
   </body>
 </html>
