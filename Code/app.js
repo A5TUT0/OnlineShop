@@ -8,6 +8,7 @@ const swaggerDocument = require("./swagger.json");
 const cors = require("cors");
 const app = express();
 const path = require("path");
+const req = require("express/lib/request");
 const port = 3000;
 const secretKey = "your_secret_key";
 const SECRET_KEY = "your_secret_key";
@@ -240,6 +241,25 @@ app.delete("/products/:id", authenticateToken, authorizeAdmin, (req, res) => {
     }
     res.json({ message: "Product deleted" });
   });
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "/index.html"));
+});
+app.get("/product", (req, res) => {
+  res.sendFile(path.join(__dirname, "/src/ProductsCRUD.html"));
+});
+app.get("/categorie", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "/CategoryCRUD.html"));
+});
+app.get("/einloggen", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "/LogIn.html"));
+});
+app.get("/registrieren", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "/Register.html"));
+});
+app.get("/überuns", (req, res) => {
+  res.sendFile(path.join(__dirname, "src", "überuns.html"));
 });
 app.use((req, res, next) => {
   res.status(404).sendFile(path.join(__dirname, "src", "error404.html"));
