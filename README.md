@@ -1,139 +1,103 @@
 # Online Shop
 
-This project is a frontend application for managing products and categories in an online shop. It features user authentication, product and category management through a user-friendly interface, and communicates with an API developed using Express and a SQLite database. Tailwind CSS is used for the design and styling of the user interface, enabling the creation of modern and responsive UI components efficiently.
-
-## Table of Contents
-
-1. [Installation](#installation)
-2. [Setup](#setup)
-3. [Usage](#usage)
-4. [API Endpoints](#api-endpoints)
-5. [File Structure](#file-structure)
-6. [Technologies Used](#technologies-used)
-7. [Contributing](#contributing)
-8. [License](#license)
+Dieses Projekt ist eine Frontend-Anwendung zur Verwaltung von Produkten und Kategorien in einem Online-Shop. Es bietet Benutzerauthentifizierung, Produkt- und Kategorieverwaltung durch eine benutzerfreundliche Oberfläche und kommuniziert mit einer API, die mit Express und einer SQLite-Datenbank entwickelt wurde. Tailwind CSS wird für das Design und Styling der Benutzeroberfläche verwendet, was die effiziente Erstellung moderner und responsiver UI-Komponenten ermöglicht.
 
 ## Installation
 
-To get started with this project, you'll need to clone the repository and install the necessary dependencies.
+Sie müssen mein Repository klonen: `https://github.com/A5TUT0/OnlineShop.git`
+Dann müssen Sie in den Ordner `Code` wechseln: `cd OnlineShop/Code`
+Als nächstes müssen Sie im Terminal `npm install` & `node app.js` eingeben.
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/A5TUT0/OnlineShop.git
-    cd OnlineShop/Code
-    ```
+## Nutzung
 
-2. Install the dependencies:
-    ```sh
-    npm install
-    ```
+1. Öffnen Sie Ihren Webbrowser und navigieren Sie zu `http://localhost:3000`.
+2. Sie können einen neuen Benutzer registrieren, sich anmelden, Produkte und Kategorien über die bereitgestellte Benutzeroberfläche verwalten. Wenn Sie sich als Administrator registrieren möchten, müssen Sie sich mit Benutzername: admin und Passwort: admin anmelden.
 
-## Setup
+## API Endpunkte
 
-1. Ensure you have Node.js and npm installed. You can download Node.js from [here](https://nodejs.org/).
+### Benutzerverwaltung
 
-2. Initialize the SQLite database:
-    ```sh
-    npm run init-db
-    ```
-
-3. Start the server:
-    ```sh
-    npm start
-    ```
-
-The server should now be running at `http://localhost:3000`.
-
-## Usage
-
-1. Open your web browser and navigate to `http://localhost:3000`.
-2. You can register a new user, log in, manage products and categories through the provided interface.
-
-## API Endpoints
-
-### User Management
-
-- **Register a new user**
+- **Registrieren eines neuen Benutzers**
   - **URL:** `http://localhost:3000/register`
-  - **Method:** `POST`
-  - **Description:** Register a new user.
+  - **Methode:** `POST`
+  - **Beschreibung:** Registrieren eines neuen Benutzers.
 
-- **Log in a user**
+- **Einloggen eines Benutzers**
   - **URL:** `http://localhost:3000/login`
-  - **Method:** `POST`
-  - **Description:** Log in a user.
+  - **Methode:** `POST`
+  - **Beschreibung:** Einloggen eines Benutzers.
 
-- **Reset password**
+- **Passwort zurücksetzen**
   - **URL:** `http://localhost:3000/reset-password`
-  - **Method:** `POST`
-  - **Description:** Reset a user's password.
+  - **Methode:** `POST`
+  - **Beschreibung:** Zurücksetzen des Passworts eines Benutzers.
 
-### Category Management
+### Kategorienverwaltung
 
-- **Get all categories**
+- **Alle Kategorien abrufen**
   - **URL:** `http://localhost:3000/categories`
-  - **Method:** `GET`
-  - **Description:** Retrieve all categories.
+  - **Methode:** `GET`
+  - **Beschreibung:** Abrufen aller Kategorien.
 
-- **Create a new category**
+- **Neue Kategorie erstellen**
   - **URL:** `http://localhost:3000/categories`
-  - **Method:** `POST`
-  - **Description:** Create a new category.
+  - **Methode:** `POST`
+  - **Beschreibung:** Erstellen einer neuen Kategorie.
 
-- **Get category by ID**
+- **Kategorie nach ID abrufen**
   - **URL:** `http://localhost:3000/categories/{id}`
-  - **Method:** `GET`
-  - **Description:** Retrieve a category by its ID.
+  - **Methode:** `GET`
+  - **Beschreibung:** Abrufen einer Kategorie anhand ihrer ID.
 
-- **Update category**
+- **Kategorie aktualisieren**
   - **URL:** `http://localhost:3000/categories/{id}`
-  - **Method:** `PUT`
-  - **Description:** Update a category by its ID.
+  - **Methode:** `PUT`
+  - **Beschreibung:** Aktualisieren einer Kategorie anhand ihrer ID.
 
-- **Delete category**
+- **Kategorie löschen**
   - **URL:** `http://localhost:3000/categories/{id}`
-  - **Method:** `DELETE`
-  - **Description:** Delete a category by its ID.
+  - **Methode:** `DELETE`
+  - **Beschreibung:** Löschen einer Kategorie anhand ihrer ID.
 
-### Product Management
+### Produktverwaltung
 
-- **Get all products**
+- **Alle Produkte abrufen**
   - **URL:** `http://localhost:3000/products`
-  - **Method:** `GET`
-  - **Description:** Retrieve all products.
+  - **Methode:** `GET`
+  - **Beschreibung:** Abrufen aller Produkte.
 
-- **Create a new product**
+- **Neues Produkt erstellen**
   - **URL:** `http://localhost:3000/products`
-  - **Method:** `POST`
-  - **Description:** Create a new product.
+  - **Methode:** `POST`
+  - **Beschreibung:** Erstellen eines neuen Produkts.
 
-- **Get product by ID**
+- **Produkt nach ID abrufen**
   - **URL:** `http://localhost:3000/products/{id}`
-  - **Method:** `GET`
-  - **Description:** Retrieve a product by its ID.
+  - **Methode:** `GET`
+  - **Beschreibung:** Abrufen eines Produkts anhand seiner ID.
 
-- **Update product**
+- **Produkt aktualisieren**
   - **URL:** `http://localhost:3000/products/{id}`
-  - **Method:** `PUT`
-  - **Description:** Update a product by its ID.
+  - **Methode:** `PUT`
+  - **Beschreibung:** Aktualisieren eines Produkts anhand seiner ID.
 
-- **Delete product**
+- **Produkt löschen**
   - **URL:** `http://localhost:3000/products/{id}`
-  - **Method:** `DELETE`
-  - **Description:** Delete a product by its ID.
+  - **Methode:** `DELETE`
+  - **Beschreibung:** Löschen eines Produkts anhand seiner ID.
 
-### Description of Main Files
+### Beschreibung der Hauptdateien
 
-- **app.js:** The main file of the application that configures and starts the Express server. It defines the various API endpoints for user, product, and category management.
-- **database.sqlite:** The SQLite database file that stores all the application data, including users, products, and categories.
-- **swagger.json:** This file contains the Swagger documentation for the API, providing a visual and interactive representation of the API endpoints and their functionalities.
-- **tailwind.config.js:** This file configures Tailwind CSS, a CSS framework used for styling the application.
-- **src/index.html:** The main HTML file of the application, serving as the entry point. It includes the basic structure and references to CSS and JavaScript files.
-- **src/main.js:** Contains the main JavaScript code that controls the application’s functionality, including event handlers and API calls.
+- **app.js:** Die Hauptdatei der Anwendung, die den Express-Server konfiguriert und startet. Sie definiert die verschiedenen API-Endpunkte für die Benutzer-, Produkt- und Kategorienverwaltung.
+- **database.sqlite:** Die SQLite-Datenbankdatei, die alle Anwendungsdaten wie Benutzer, Produkte und Kategorien speichert.
+- **swagger.json:** Diese Datei enthält die Swagger-Dokumentation für die API, die eine visuelle und interaktive Darstellung der API-Endpunkte und ihrer Funktionalitäten bietet.
+- **tailwind.config.js:** Diese Datei konfiguriert Tailwind CSS, ein CSS-Framework, das zur Gestaltung der Anwendung verwendet wird.
+- **src/index.html:** Die Haupt-HTML-Datei der Anwendung, die als Einstiegspunkt dient. Sie enthält die grundlegende Struktur und Verweise auf CSS- und JavaScript-Dateien.
+- **src/main.js:** Enthält den Haupt-JavaScript-Code, der die Funktionalität der Anwendung steuert, einschließlich Ereignishandlern und API-Aufrufen.
 
-## Technologies Used
+## Verwendete Technologien
 
-- **Node.js and Express:** Backend technologies used to create the server and API endpoints.
-- **SQLite:** Database used to store application data.
-- **Tailwind CSS:** A CSS framework used for styling the application.
-- **Swagger:** A tool used to document and interact with the API.
+- **Node.js und Express:** Backend-Technologien zur Erstellung des Servers und der API-Endpunkte.
+- **SQLite:** Datenbank zur Speicherung der Anwendungsdaten.
+- **Tailwind CSS:** Ein CSS-Framework zur Gestaltung der Anwendung.
+- **Swagger:** Ein Tool zur Dokumentation und Interaktion mit der API.
