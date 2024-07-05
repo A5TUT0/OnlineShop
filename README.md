@@ -19,7 +19,7 @@ To get started with this project, you'll need to clone the repository and instal
 
 1. Clone the repository:
     ```sh
-    git clone [https://github.com/yourusername/OnlineShop.git](https://github.com/A5TUT0/OnlineShop.git)
+    git clone https://github.com/A5TUT0/OnlineShop.git
     cd OnlineShop/Code
     ```
 
