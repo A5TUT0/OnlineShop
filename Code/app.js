@@ -7,6 +7,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 const cors = require("cors");
 const app = express();
+const path = require("path");
 const port = 3000;
 const secretKey = "your_secret_key";
 const SECRET_KEY = "your_secret_key";
@@ -240,7 +241,9 @@ app.delete("/products/:id", authenticateToken, authorizeAdmin, (req, res) => {
     res.json({ message: "Product deleted" });
   });
 });
-
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "src", "error404.html"));
+});
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

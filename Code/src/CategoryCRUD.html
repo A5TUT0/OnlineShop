@@ -191,35 +191,38 @@
     </div>
 
     <script>
+      // Abrufen des Tokens aus dem localStorage
       const token = localStorage.getItem("token");
-      let isEditMode = false;
+      let isEditMode = false; // Variable zur Verfolgung, ob sich das Formular im Bearbeitungsmodus befindet
 
       document.addEventListener("DOMContentLoaded", function () {
-        // Event listener para abrir el modal de creación de categorías
+        // Event-Listener zum Öffnen des Modals für die Erstellung einer Kategorie
         document
           .getElementById("categoryModalButton")
           .addEventListener("click", function () {
             openModal("categoryModal");
           });
 
-        // Función para abrir el modal por su ID
+        // Funktion zum Öffnen des Modals basierend auf der ID
         function openModal(modalId) {
           var modal = document.getElementById(modalId);
-          modal.style.display = "block";
-          modal.classList.add("show");
-          modal.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden"; // Evitar desplazamiento del fondo
+          modal.style.display = "block"; // Modal sichtbar machen
+          modal.classList.add("show"); // CSS-Klasse 'show' hinzufügen
+          modal.setAttribute("aria-hidden", "false"); // Aria-Attribut für Barrierefreiheit setzen
+          document.body.style.overflow = "hidden"; // Verhindern, dass der Hintergrund scrollt
         }
 
-        // Función para cerrar el modal por su ID y limpiar el formulario correspondiente
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+
+        // Funktion zum Schließen des Modals basierend auf der ID und Bereinigen des Formulars
         function closeModal(modalId) {
           var modal = document.getElementById(modalId);
-          modal.classList.remove("show");
-          modal.style.display = "none"; // Asegurarse de que el modal esté completamente oculto
-          modal.setAttribute("aria-hidden", "true");
-          document.body.style.overflow = "auto"; // Permitir desplazamiento del fondo
+          modal.classList.remove("show"); // CSS-Klasse 'show' entfernen
+          modal.style.display = "none"; // Modal unsichtbar machen
+          modal.setAttribute("aria-hidden", "true"); // Aria-Attribut für Barrierefreiheit setzen
+          document.body.style.overflow = "auto"; // Ermöglichen, dass der Hintergrund scrollt
 
-          // Limpiar el formulario de categorías si se cierra el modal de categorías
+          // Formular zurücksetzen, wenn das Kategorie-Modal geschlossen wird
           if (modalId === "categoryModal") {
             document.getElementById("createCategoryForm").reset();
             document.getElementById("modalAction").textContent =
@@ -228,66 +231,63 @@
           }
         }
 
-        // Listener para cerrar el modal haciendo clic fuera de él
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute
+
+        // Event-Listener, um das Modal zu schließen, wenn außerhalb geklickt wird
         window.onclick = function (event) {
           if (event.target.classList.contains("modal")) {
             closeModal(event.target.id);
           }
         };
 
-        // Función para cargar las categorías desde la API y actualizar la lista
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Window/onclick
+
+        // Funktion zum Laden der Kategorien aus der API und Aktualisieren der Liste
         function loadCategories() {
           fetch("http://localhost:3000/categories")
             .then((response) => response.json())
             .then((categories) => {
               const categoriesList = document.querySelector("tbody");
-              categoriesList.innerHTML = "";
+              categoriesList.innerHTML = ""; // Alte Inhalte entfernen
 
+              // Iterieren über jede Kategorie und zur Tabelle hinzufügen
               categories.forEach((category) => {
                 const row = `
-                <tr>
-                  <td class="py-3 px-6 text-left">${category.name}</td>
-                  <td class="py-3 px-6 text-left">
-                    <button
-                      class="text-indigo-600 hover:text-indigo-900"
-                      onclick="editCategory('${category.id}')"
-                    >
-                      Bearbeiten
-                    </button>
-                    <button
-                      class="text-red-600 hover:text-red-900 ml-2"
-                      onclick="confirmDelete('${category.id}')"
-                    >
-                      Löschen
-                    </button>
-                  </td>
-                </tr>
-              `;
-                categoriesList.innerHTML += row;
+            <tr>
+              <td class="py-3 px-6 text-left">${category.name}</td>
+              <td class="py-3 px-6 text-left">
+                <button class="text-indigo-600 hover:text-indigo-900" onclick="editCategory('${category.id}')">Bearbeiten</button>
+                <button class="text-red-600 hover:text-red-900 ml-2" onclick="confirmDelete('${category.id}')">Löschen</button>
+              </td>
+            </tr>
+          `;
+                categoriesList.innerHTML += row; // Zeile zur Tabelle hinzufügen
               });
             })
             .catch((error) => {
-              console.error("Error fetching categories:", error);
+              console.error("Fehler beim Abrufen der Kategorien:", error);
             });
         }
 
-        // Listener para el formulario de creación de categorías
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+        // Event-Listener für das Kategorie-Erstellungsformular
         const createCategoryForm =
           document.getElementById("createCategoryForm");
 
         if (!createCategoryForm) {
           console.error(
-            "No se encontró el formulario createCategoryForm en el DOM."
+            "Das Formular createCategoryForm wurde im DOM nicht gefunden."
           );
           return;
         }
 
         createCategoryForm.addEventListener("submit", function (e) {
-          e.preventDefault();
+          e.preventDefault(); // Standardformularübermittlung verhindern
 
           const formData = new FormData(e.target);
           const data = {
-            name: formData.get("categoryName"),
+            name: formData.get("categoryName"), // Name der Kategorie aus dem Formular
           };
 
           let url = "http://localhost:3000/categories";
@@ -302,23 +302,23 @@
             method: method,
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`, // Token zur Authentifizierung hinzufügen
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data), // Daten als JSON senden
           })
             .then((response) => {
               if (!response.ok) {
                 throw new Error(
                   isEditMode
-                    ? "Error al actualizar la categoría"
-                    : "Error al crear la categoría"
+                    ? "Fehler beim Aktualisieren der Kategorie"
+                    : "Fehler beim Erstellen der Kategorie"
                 );
               }
               return response.json();
             })
             .then((result) => {
               console.log(
-                isEditMode ? "Categoría actualizada:" : "Categoría creada:",
+                isEditMode ? "Kategorie aktualisiert:" : "Kategorie erstellt:",
                 result
               );
               alert(
@@ -327,22 +327,22 @@
                   : "Kategorie erfolgreich erstellt"
               );
               closeModal("categoryModal");
-              loadCategories();
+              loadCategories(); // Kategorienliste neu laden
             })
             .catch((error) => {
-              console.error("Error:", error);
+              console.error("Fehler:", error);
               alert(
                 isEditMode
-                  ? "Error al actualizar la categoría: " + error.message
+                  ? "Fehler beim Aktualisieren der Kategorie: " + error.message
                   : "Fehler beim Verbinden mit der API: " + error.message
               );
             });
         });
 
-        // Cargar las categorías al cargar la página
+        // Kategorien laden, wenn die Seite geladen wird
         loadCategories();
 
-        // Función para obtener datos de categoría y abrir el modal en modo de edición
+        // Funktion zum Abrufen von Kategorie-Daten und Öffnen des Modals im Bearbeitungsmodus
         window.editCategory = function (categoryId) {
           fetch(`http://localhost:3000/categories/${categoryId}`)
             .then((response) => response.json())
@@ -355,43 +355,53 @@
               openModal("categoryModal");
             })
             .catch((error) => {
-              console.error("Error fetching category:", error);
+              console.error("Fehler beim Abrufen der Kategorie:", error);
               alert(
-                "Error al obtener los datos de la categoría: " + error.message
+                "Fehler beim Abrufen der Kategorie-Daten: " + error.message
               );
             });
         };
 
-        // Función para confirmar y eliminar una categoría
+        // Funktion zum Bestätigen und Löschen einer Kategorie
         window.confirmDelete = function (categoryId) {
           if (
-            confirm("Bist du sicher, dass du diese Kategorie löschen möchtest?")
+            confirm(
+              "Sind Sie sicher, dass Sie diese Kategorie löschen möchten?"
+            )
           ) {
             fetch(`http://localhost:3000/categories/${categoryId}`, {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`, // Token zur Authentifizierung hinzufügen
               },
             })
               .then((response) => {
                 if (!response.ok) {
-                  throw new Error("Error al eliminar la categoría");
+                  throw new Error("Fehler beim Löschen der Kategorie");
                 }
                 return response.json();
               })
               .then((result) => {
-                console.log("Categoría eliminada:", result);
+                console.log("Kategorie gelöscht:", result);
                 alert("Kategorie erfolgreich gelöscht");
-                loadCategories(); // Actualizar la lista de categorías
+                loadCategories(); // Kategorienliste neu laden
               })
               .catch((error) => {
-                console.error("Error:", error);
+                console.error("Fehler:", error);
                 alert("Fehler beim Verbinden mit der API: " + error.message);
               });
           }
         };
       });
+
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Window/onclick
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
     </script>
   </body>
 </html>

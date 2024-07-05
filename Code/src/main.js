@@ -1,23 +1,29 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Función para manejar el registro
+  // Funktion zur Handhabung der Registrierung
   function handleRegister() {
+    // Formular für die Registrierung abrufen
     const registerForm = document.getElementById("registerForm");
     if (!registerForm) return;
 
+    // Event-Listener für das Submit-Ereignis des Formulars hinzufügen
     registerForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+      e.preventDefault(); // Verhindern des Standard-Submit-Verhaltens
 
+      // Eingabewerte abrufen
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirm-password").value;
 
+      // Überprüfen, ob die Passwörter übereinstimmen
       if (password !== confirmPassword) {
         alert("Passwörter stimmen nicht überein");
         return;
       }
 
+      // Daten für die Registrierung erstellen
       const data = { username, password, role: "user" };
 
+      // API-Anfrage zur Registrierung senden
       fetch("http://localhost:3000/register", {
         method: "POST",
         headers: {
@@ -32,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return response.json();
         })
         .then((result) => {
+          // Überprüfen, ob der Benutzer ein Admin ist
           if (result.role === "admin") {
             const token = jwt.sign(
               { username: result.username, role: result.role },
@@ -50,19 +57,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Función para manejar el inicio de sesión
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
+
+  // Funktion zur Handhabung des Logins
   function handleLogin() {
+    // Formular für den Login abrufen
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
 
+    // Event-Listener für das Submit-Ereignis des Formulars hinzufügen
     loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+      e.preventDefault(); // Verhindern des Standard-Submit-Verhaltens
 
+      // Eingabewerte abrufen
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
+      // Daten für den Login erstellen
       const data = { username, password };
 
+      // API-Anfrage zum Login senden
       fetch("http://localhost:3000/login", {
         method: "POST",
         headers: {
@@ -82,8 +97,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const token = result.token;
           const payload = JSON.parse(atob(token.split(".")[1]));
 
+          // Token im localStorage speichern
           localStorage.setItem("token", token);
 
+          // Weiterleitung basierend auf der Rolle
           if (payload.role === "admin") {
             window.location.href = "./ProductsCRUD.html";
           } else {
@@ -97,25 +114,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Función para manejar el restablecimiento de contraseña
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/atob
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+  // Funktion zur Handhabung des Passwort-Zurücksetzens
   function handleResetPassword() {
+    // Formular zum Zurücksetzen des Passworts abrufen
     const resetPasswordForm = document.getElementById("resetPasswordForm");
     if (!resetPasswordForm) return;
 
+    // Event-Listener für das Submit-Ereignis des Formulars hinzufügen
     resetPasswordForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+      e.preventDefault(); // Verhindern des Standard-Submit-Verhaltens
 
+      // Eingabewerte abrufen
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirm-password").value;
 
+      // Überprüfen, ob die Passwörter übereinstimmen
       if (password !== confirmPassword) {
         alert("Passwörter stimmen nicht überein");
         return;
       }
 
+      // Daten für das Zurücksetzen des Passworts erstellen
       const data = { username, newPassword: password };
 
+      // API-Anfrage zum Zurücksetzen des Passworts senden
       fetch("http://localhost:3000/reset-password", {
         method: "POST",
         headers: {
@@ -141,23 +167,31 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Función para cargar productos
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+  // Funktion zum Laden der Produkte
   function loadProducts() {
+    // API-Anfrage zum Abrufen der Produkte senden
     fetch("http://localhost:3000/products")
-      .then((response) => response.json())
+      .then((response) => response.json()) // Umwandeln der Antwort in JSON
       .then((products) => {
+        // Tabellenkörper-Element abrufen
         const productTableBody = document.getElementById("productTableBody");
         if (!productTableBody) return;
-        productTableBody.innerHTML = "";
+        productTableBody.innerHTML = ""; // Alte Inhalte entfernen
 
+        // Durch jedes Produkt iterieren
         products.forEach((product) => {
+          // Kategorie für das aktuelle Produkt abrufen
           fetch(`http://localhost:3000/categories/${product.categoryId}`)
             .then((response) => response.json())
             .then((category) => {
+              // Karten-Element für das Produkt erstellen
               const card = document.createElement("div");
               card.className =
                 "rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800";
 
+              // Inhalt der Karte mit Produkt- und Kategoriedaten füllen
               card.innerHTML = `
                 <div class="h-56 w-full">
                   <a href="#">
@@ -186,42 +220,65 @@ document.addEventListener("DOMContentLoaded", function () {
                   </div>
                 </div>
               `;
+              // Karte zum Tabellenkörper hinzufügen
               productTableBody.appendChild(card);
             })
-            .catch((error) => console.error("Error fetching category:", error));
+            .catch((error) =>
+              console.error("Fehler beim Abrufen der Kategorie:", error)
+            );
         });
       })
-      .catch((error) => console.error("Error fetching products:", error));
+      .catch((error) =>
+        console.error("Fehler beim Abrufen der Produkte:", error)
+      );
   }
 
-  // Función para cargar categorías
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+  // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+
+  // Funktion zum Laden der Kategorien
   function loadCategories() {
+    // API-Anfrage zum Abrufen der Kategorien senden
     fetch("http://localhost:3000/categories")
-      .then((response) => response.json())
+      .then((response) => response.json()) // Umwandeln der Antwort in JSON
       .then((categories) => {
+        // Container-Element für Kategorien abrufen
         const categoryContainer = document.getElementById("categoryContainer");
         if (!categoryContainer) return;
-        categoryContainer.innerHTML = "";
+        categoryContainer.innerHTML = ""; // Alte Inhalte entfernen
 
+        // Durch jede Kategorie iterieren
         categories.forEach((category) => {
+          // Karten-Element für die Kategorie erstellen
           const categoryCard = document.createElement("div");
           categoryCard.className =
             "flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700";
+          // Inhalt der Karte mit Kategoriedaten füllen
           categoryCard.innerHTML = `
             <svg class="me-2 h-4 w-4 shrink-0 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v5m-3 0h6M4 11h16M5 15h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1Z"/>
             </svg>
             <span class="text-sm font-medium text-gray-900 dark:text-white">${category.name}</span>
           `;
+          // Karte zum Container hinzufügen
           categoryContainer.appendChild(categoryCard);
         });
       })
-      .catch((error) => console.error("Error fetching categories:", error));
+      .catch((error) =>
+        console.error("Fehler beim Abrufen der Kategorien:", error)
+      );
   }
 
+  // Funktionen aufrufen, wenn das DOM vollständig geladen ist
   handleRegister();
   handleLogin();
   handleResetPassword();
   loadProducts();
   loadCategories();
 });
+
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
+// Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild

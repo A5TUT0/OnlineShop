@@ -226,31 +226,48 @@
     </div>
 
     <script>
+      // Abrufen des Tokens aus dem localStorage und Initialisierung der isEditMode-Variable
       const token = localStorage.getItem("token");
       let isEditMode = false;
 
       document.addEventListener("DOMContentLoaded", function () {
+        // Funktion zum Öffnen des Modals basierend auf der ID
         function openModal(modalId) {
+          // Modal-Element anhand der ID abrufen
           var modal = document.getElementById(modalId);
+          // Überprüfen, ob das Modal-Element existiert
           if (!modal) {
             console.error(`Kein Modal mit der ID ${modalId} gefunden.`);
             return;
           }
+          // CSS-Klasse 'show' hinzufügen, um das Modal anzuzeigen
           modal.classList.add("show");
+          // Aria-Attribut für Barrierefreiheit setzen
           modal.setAttribute("aria-hidden", "false");
+          // Verhindern, dass der Hintergrund scrollt
           document.body.style.overflow = "hidden";
         }
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+
+        // Funktion zum Schließen des Modals basierend auf der ID und Bereinigen des Formulars
         function closeModal(modalId) {
+          // Modal-Element anhand der ID abrufen
           var modal = document.getElementById(modalId);
+          // Überprüfen, ob das Modal-Element existiert
           if (!modal) {
             console.error(`Kein Modal mit der ID ${modalId} gefunden.`);
             return;
           }
+          // CSS-Klasse 'show' entfernen, um das Modal zu verbergen
           modal.classList.remove("show");
+          // Aria-Attribut für Barrierefreiheit setzen
           modal.setAttribute("aria-hidden", "true");
+          // Ermöglichen, dass der Hintergrund scrollt
           document.body.style.overflow = "auto";
 
+          // Formular zurücksetzen, wenn das Produkt-Modal geschlossen wird
           if (modalId === "defaultModal") {
             document.getElementById("productForm").reset();
             document.getElementById("modalAction").textContent =
@@ -259,85 +276,122 @@
           }
         }
 
-        var defaultModalButton = document.getElementById("defaultModalButton");
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reset
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttribute
 
+        // Event-Listener für den Button zum Öffnen des Produkt-Modals
+        var defaultModalButton = document.getElementById("defaultModalButton");
+        // Überprüfen, ob der Button existiert
         if (defaultModalButton) {
+          // Event-Listener für Klick-Ereignis hinzufügen
           defaultModalButton.addEventListener("click", function () {
             openModal("defaultModal");
           });
         }
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+
+        // Event-Listener, um das Modal zu schließen, wenn außerhalb geklickt wird
         window.onclick = function (event) {
+          // Überprüfen, ob das Ziel-Element die CSS-Klasse 'modal' enthält
           if (event.target.classList.contains("modal")) {
+            // Modal-Element verbergen
             event.target.classList.remove("show");
             event.target.setAttribute("aria-hidden", "true");
+            // Ermöglichen, dass der Hintergrund scrollt
             document.body.style.overflow = "auto";
           }
         };
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Window/onclick
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+
+        // Abrufen der Kategorien und Befüllen des Kategorie-Dropdowns
         fetch("http://localhost:3000/categories")
-          .then((response) => response.json())
+          .then((response) => response.json()) // Umwandeln der Antwort in JSON
           .then((data) => {
+            // Kategorie-Dropdown-Element abrufen
             const categorySelect = document.getElementById("category");
 
+            // Durch jede Kategorie iterieren
             data.forEach((category) => {
+              // Option-Element erstellen
               const option = document.createElement("option");
+              // Wert und Text der Option setzen
               option.value = category.id;
               option.textContent = category.name;
+              // Option zum Kategorie-Dropdown hinzufügen
               categorySelect.appendChild(option);
             });
 
+            // Produkte laden, nachdem die Kategorien geladen wurden
             loadProducts();
           })
           .catch((error) =>
             console.error("Fehler beim Abrufen der Kategorien:", error)
           );
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Response/json
+
+        // Event-Listener für das Produktformular
         const productForm = document.getElementById("productForm");
 
+        // Überprüfen, ob das Produktformular existiert
         if (productForm) {
+          // Event-Listener für das Submit-Ereignis hinzufügen
           productForm.addEventListener("submit", function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Standardformularübermittlung verhindern
 
+            // Formulardaten abrufen
             const formData = new FormData(e.target);
+            // Datei-Input-Element abrufen
             const fileInput = document.getElementById("file_input");
 
+            // Überprüfen, ob eine Datei ausgewählt wurde
             if (
-              !fileInput ||
-              !fileInput.files ||
-              fileInput.files.length === 0
+              // Ki Tool generiert
+              !fileInput || // Ki Tool generiert
+              !fileInput.files || // Ki Tool generiert
+              fileInput.files.length === 0 // Ki Tool generiert
             ) {
-              alert("Sie müssen eine Bilddatei auswählen.");
-              return;
-            }
+              // Ki Tool generiert
+              alert("Sie müssen eine Bilddatei auswählen."); // Ki Tool generiert
+              return; // Ki Tool generiert
+            } // Ki Tool generiert
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+            // Erste Datei aus dem Datei-Input abrufen
+            const file = fileInput.files[0]; // Ki Tool generiert
+            const reader = new FileReader(); // Ki Tool generiert
+            // Event-Listener für das Lade-Ereignis des FileReaders
             reader.onload = function (event) {
-              const base64Image = event.target.result;
+              const base64Image = event.target.result; // Base64-codiertes Bild, KI Tool gebraucht
 
+              // Produktdaten erstellen
               const data = {
                 name: formData.get("name"),
                 price: parseFloat(formData.get("price")),
                 categoryId: parseInt(formData.get("category")),
-                image: base64Image,
+                image: base64Image, // KI Tool
               };
 
               let url = "http://localhost:3000/products";
               let method = "POST";
+              // Überprüfen, ob der Bearbeitungsmodus aktiv ist
               if (isEditMode) {
                 const productId = document.getElementById("productId").value;
                 url = `http://localhost:3000/products/${productId}`;
                 method = "PUT";
               }
 
+              // Senden der Produktdaten an die API
               fetch(url, {
                 method: method,
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
+                  Authorization: `Bearer ${token}`, // Token zur Authentifizierung hinzufügen
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(data), // Daten als JSON senden
               })
                 .then((response) => {
                   if (!response.ok) {
@@ -359,8 +413,8 @@
                       ? "Produkt erfolgreich aktualisiert"
                       : "Produkt erfolgreich erstellt"
                   );
-                  closeModal("defaultModal");
-                  loadProducts();
+                  closeModal("defaultModal"); // Modal schließen
+                  loadProducts(); // Produkte neu laden
                 })
                 .catch((error) => {
                   console.error("Fehler:", error);
@@ -373,24 +427,34 @@
                 });
             };
 
+            // Datei als Data URL lesen
             reader.readAsDataURL(file);
           });
         }
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/FormData
+
+        // Funktion zum Laden der Produkte aus der API und Aktualisieren der Tabelle
         function loadProducts() {
           fetch("http://localhost:3000/products")
-            .then((response) => response.json())
+            .then((response) => response.json()) // Umwandeln der Antwort in JSON
             .then((data) => {
+              // Tabellenkörper-Element abrufen
               const productTableBody =
                 document.getElementById("productTableBody");
-              productTableBody.innerHTML = "";
+              productTableBody.innerHTML = ""; // Alte Inhalte entfernen
 
+              // Durch jedes Produkt iterieren
               data.forEach((product) => {
+                // Zeilen-Element erstellen
                 const row = document.createElement("tr");
 
+                // Kategorie für das aktuelle Produkt abrufen
                 fetch(`http://localhost:3000/categories/${product.categoryId}`)
                   .then((response) => response.json())
                   .then((category) => {
+                    // Inhalt der Zeile mit Produkt- und Kategoriedaten füllen
                     row.innerHTML = `
                 <td class="px-6 py-4">${product.name}</td>
                 <td class="px-6 py-4">${category.name}</td>
@@ -406,6 +470,7 @@
                   })">Löschen</button>
                 </td>
               `;
+                    // Zeile zur Tabelle hinzufügen
                     productTableBody.appendChild(row);
                   })
                   .catch((error) =>
@@ -418,18 +483,24 @@
             );
         }
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
+
+        // Funktion zum Bearbeiten eines Produkts
         window.editProduct = function (productId) {
+          // Produktdaten anhand der ID abrufen
           fetch(`http://localhost:3000/products/${productId}`)
             .then((response) => response.json())
             .then((product) => {
+              // Formularfelder mit den Produktdaten füllen
               document.getElementById("productId").value = product.id;
               document.getElementById("name").value = product.name;
               document.getElementById("price").value = product.price;
               document.getElementById("category").value = product.categoryId;
               document.getElementById("modalAction").textContent =
                 "Produkt aktualisieren";
-              isEditMode = true;
-              openModal("defaultModal");
+              isEditMode = true; // Bearbeitungsmodus aktivieren
+              openModal("defaultModal"); // Modal öffnen
             })
             .catch((error) => {
               console.error("Fehler beim Abrufen des Produkts:", error);
@@ -437,15 +508,19 @@
             });
         };
 
+        // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+        // Funktion zum Löschen eines Produkts
         window.deleteProduct = function (productId) {
           if (
             confirm("Sind Sie sicher, dass Sie dieses Produkt löschen möchten?")
           ) {
+            // API-Aufruf zum Löschen des Produkts
             fetch(`http://localhost:3000/products/${productId}`, {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`, // Token zur Authentifizierung hinzufügen
               },
             })
               .then((response) => {
@@ -457,7 +532,7 @@
               .then((result) => {
                 console.log("Produkt gelöscht:", result);
                 alert("Produkt erfolgreich gelöscht");
-                loadProducts();
+                loadProducts(); // Produkte neu laden
               })
               .catch((error) => {
                 console.error("Fehler:", error);
@@ -466,6 +541,8 @@
           }
         };
       });
+
+      // Quelle: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
     </script>
   </body>
 </html>
